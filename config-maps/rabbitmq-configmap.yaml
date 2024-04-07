@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-configmap
+  # Add labels and annotations as per your requirements
+data:
+  definitions.json: |-
+    # RabbitMQ definitions go here
+  enabled_plugins: '[rabbitmq_peer_discovery_k8s, rabbitmq_prometheus].'
+  rabbitmq.conf: |-
+    # RabbitMQ configuration options go here

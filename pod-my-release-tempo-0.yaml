@@ -1,0 +1,166 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    checksum/config: e6bdbc686b7b8a1b1b11ab3cd90fa6ec5f20d8b0f14331975338283a6fed0af2
+    kubernetes.io/limit-ranger: 'LimitRanger plugin set: cpu, memory request for container
+      tempo; cpu, memory limit for container tempo'
+  creationTimestamp: "2024-04-01T17:07:13Z"
+  generateName: my-release-tempo-
+  labels:
+    app.kubernetes.io/instance: my-release
+    app.kubernetes.io/name: tempo
+    controller-revision-hash: my-release-tempo-655d474fb8
+    statefulset.kubernetes.io/pod-name: my-release-tempo-0
+  name: my-release-tempo-0
+  namespace: latipe
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: StatefulSet
+    name: my-release-tempo
+    uid: 5c00704d-ef56-493f-9154-6b49bd79d5af
+  resourceVersion: "29655"
+  uid: 5e39be40-8a49-40c3-a310-cb378c9f8e99
+spec:
+  automountServiceAccountToken: true
+  containers:
+  - args:
+    - -config.file=/conf/tempo.yaml
+    - -mem-ballast-size-mbs=1024
+    image: grafana/tempo:2.3.1
+    imagePullPolicy: IfNotPresent
+    name: tempo
+    ports:
+    - containerPort: 3100
+      name: prom-metrics
+      protocol: TCP
+    - containerPort: 6831
+      name: jaeger-thrift-c
+      protocol: UDP
+    - containerPort: 6832
+      name: jaeger-thrift-b
+      protocol: UDP
+    - containerPort: 14268
+      name: jaeger-thrift-h
+      protocol: TCP
+    - containerPort: 14250
+      name: jaeger-grpc
+      protocol: TCP
+    - containerPort: 9411
+      name: zipkin
+      protocol: TCP
+    - containerPort: 55680
+      name: otlp-legacy
+      protocol: TCP
+    - containerPort: 4317
+      name: otlp-grpc
+      protocol: TCP
+    - containerPort: 55681
+      name: otlp-httplegacy
+      protocol: TCP
+    - containerPort: 4318
+      name: otlp-http
+      protocol: TCP
+    - containerPort: 55678
+      name: opencensus
+      protocol: TCP
+    resources:
+      limits:
+        cpu: 200m
+        memory: 300Mi
+      requests:
+        cpu: 200m
+        memory: 300Mi
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /conf
+      name: tempo-conf
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-lggfq
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  hostname: my-release-tempo-0
+  nodeName: orbstack
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: my-release-tempo
+  serviceAccountName: my-release-tempo
+  subdomain: my-release-tempo-headless
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - configMap:
+      defaultMode: 420
+      name: tempo
+    name: tempo-conf
+  - name: kube-api-access-lggfq
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2024-04-01T17:07:13Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2024-04-01T17:07:23Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2024-04-01T17:07:23Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2024-04-01T17:07:13Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: docker://6fed8f8c317899aa1daa71bd0272d2ce398749397e093f0c768e0def0558b446
+    image: grafana/tempo:2.3.1
+    imageID: docker-pullable://grafana/tempo@sha256:1c6fb7c74831474f82c9bde218c84b61e5269b676e6505e7dc3c1862dae9b5cc
+    lastState: {}
+    name: tempo
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2024-04-01T17:07:22Z"
+  hostIP: 198.19.249.2
+  phase: Running
+  podIP: 192.168.194.68
+  podIPs:
+  - ip: 192.168.194.68
+  - ip: fd07:b51a:cc66:a::44
+  qosClass: Guaranteed
+  startTime: "2024-04-01T17:07:13Z"

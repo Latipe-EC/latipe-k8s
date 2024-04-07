@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-cluster
+spec:
+  serviceName: redis-cluster
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-cluster
+  template:
+    metadata:
+      labels:
+        app: redis-cluster
+    spec:
+      containers:
+      - name: redis
+        image: redis:7.2.4
+        command: ["redis-server"]
+        args: ["/conf/redis.conf"]
+        env:
+        - name: REDIS_CLUSTER_ANNOUNCE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        ports:
+        - containerPort: 6379
+          name: client
+        - containerPort: 16379
+          name: gossip
+        volumeMounts:
+        - name: config
+          mountPath: /conf
+        - name: redis-data
+          mountPath: /data
+      restartPolicy: Always
+      volumes:
+      - name: config # volume use configmap as content
+        configMap:
+          name: redis-cluster-configmap # configmap name
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cluster
+spec:
+  selector:
+    app: redis-cluster # label selectors Pod redis
+  ports:
+    - port: 6379 # port of the serivce
+      targetPort: 6379 # port of the container that service will forward to 

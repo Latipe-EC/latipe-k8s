@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: latipe-store-service
+spec:
+  replicas: 1
+  strategy: # change here
+    type: RollingUpdate # strategy type is Recreate or RollingUpdate. Default is RollingUpdate
+  selector:
+    matchLabels:
+      app: latipe-store-service
+  template:
+    metadata:
+      labels:
+        app: latipe-store-service
+    spec:
+      containers:
+        - image: 0353486363/latipe-store-service:latest
+          imagePullPolicy: IfNotPresent
+          name: latipe-store-service
+          env:
+            - name: SETTINGS_FILE
+              value: "k8s.json"
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 200m
+              memory: 300Mi
+      # restartPolicy: Always
+
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: latipe-store-service
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v2
+    kind: Deployment
+    name: latipe-store-service
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

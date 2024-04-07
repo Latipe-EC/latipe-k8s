@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elasticsearch-configmap
+  # Add labels and annotations as per your requirements
+data:
+  xpack.security.enabled: "false"
+  discovery.type: single-node
+  bootstrap.memory_lock: "true"
+  ES_JAVA_OPTS: -Xmx1g -Xms1g

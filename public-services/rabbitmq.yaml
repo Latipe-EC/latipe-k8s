@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+  # Add labels and annotations as per your requirements
+spec:
+  serviceName: rabbitmq # the name of service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3.12-management # Replace with your custom Docker image
+          ports:
+            - name: amqp
+              containerPort: 5672
+              protocol: TCP
+            - name: http
+              containerPort: 15672
+              protocol: TCP
+            # - name: prometheus
+            #   containerPort: 15692
+            #   protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+              - rabbitmq-diagnostics
+              - status
+            initialDelaySeconds: 60
+            periodSeconds: 60
+            timeoutSeconds: 15
+          readinessProbe:
+            exec:
+              command:
+              - rabbitmq-diagnostics
+              - ping
+            initialDelaySeconds: 20
+            periodSeconds: 60
+            timeoutSeconds: 10
+          volumeMounts:
+            - name: rabbitmq-config
+              mountPath: /etc/rabbitmq
+            - name: rabbitmq-data
+              mountPath: /var/lib/rabbitmq/mnesia
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 1000m
+              memory: 1Gi
+      volumes:
+        - name: rabbitmq-config
+          configMap:
+            name: rabbitmq-configmap
+# Specify the name of the PVC to be used for RabbitMQ data
+  volumeClaimTemplates:
+    - metadata:
+        name: rabbitmq-data
+      spec:
+        accessModes:
+          - ReadWriteOnce  # Adjust based on your requirements
+        resources:
+          requests:
+            storage: 1Gi  # Adjust the storage size
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+spec:
+  clusterIP: None
+  selector:
+    app: rabbitmq
+  ports:
+    - name: amqp
+      port: 5672
+    - name: http
+      port: 15672

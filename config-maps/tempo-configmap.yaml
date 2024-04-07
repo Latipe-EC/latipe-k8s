@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tempo-configmap
+data:
+  tempo.yaml: |-
+    server:
+      http_listen_port: 3200
+
+    distributor:
+      receivers:
+        zipkin:
+        otlp:
+          protocols:
+            grpc:
+            http:
+
+    storage:
+      trace:
+        backend: local
+        local:
+          path: /tmp/tempo/blocks
+---

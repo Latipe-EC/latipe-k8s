@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  serviceName: mysql # the name of service
+  replicas: 1
+  selector: # Add the selector property here
+    matchLabels:
+      app: mysql
+  template: # pod template
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          envFrom:
+          - secretRef:
+              name: mysql-secret
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+          - name: mysql-data
+            mountPath: /var/lib/mysql
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 1000m
+              memory: 1Gi
+      restartPolicy: Always
+  volumeClaimTemplates: # pvc template
+    - metadata:
+        name: mysql-data
+      spec:
+        resources:
+          requests:
+            storage: 2Gi
+        accessModes:
+          - ReadWriteOnce
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  clusterIP: None
+  selector:
+    app: mysql
+  ports:
+    - name: http
+      port: 3306

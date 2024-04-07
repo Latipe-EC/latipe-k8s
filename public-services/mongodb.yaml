@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+spec:
+  serviceName: mongodb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+        selector: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:7.0.1
+        env:
+          - name: MONGO_INITDB_ROOT_USERNAME
+            valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: MONGO_INITDB_ROOT_USERNAME
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: MONGO_INITDB_ROOT_PASSWORD
+        # livenessProbe:
+        #   exec:
+        #     command:
+        #       - mongo
+        #       - --disableImplicitSessions
+        #       - --eval
+        #       - "db.adminCommand('ping')"
+        #   initialDelaySeconds: 30
+        #   periodSeconds: 10
+        #   timeoutSeconds: 5
+        #   successThreshold: 1
+        #   failureThreshold: 6
+        # readinessProbe:
+        #   exec:
+        #     command:
+        #       - mongo
+        #       - --disableImplicitSessions
+        #       - --eval
+        #       - "db.adminCommand('ping')"
+        #   initialDelaySeconds: 30
+        #   periodSeconds: 10
+        #   timeoutSeconds: 5
+        #   successThreshold: 1
+        #   failureThreshold: 6
+        volumeMounts:
+        - name: mongodb-data
+          mountPath: /data/db
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+          requests:
+            cpu: 1000m
+            memory: 1Gi
+  volumeClaimTemplates: # pvc template
+  - metadata:
+      name: mongodb-data
+    spec:
+      resources:
+        requests:
+          storage: 2Gi
+      accessModes:
+        - ReadWriteOnce
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+spec:
+  clusterIP: None
+  selector:
+    app: mongodb
+  ports:
+    - name: http
+      port: 3306

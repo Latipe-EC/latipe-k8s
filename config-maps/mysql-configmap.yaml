@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-configmap
+  # Add labels and annotations as per your requirements
+data:
+  MYSQL_DATABASE: latipe
+  MYSQL_USER: latipe
+  MYSQL_PASSWORD: latipe
+  MYSQL_ROOT_PASSWORD: latipe

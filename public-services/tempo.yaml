@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tempo
+spec:
+  serviceName: tempo
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tempo
+  template:
+    metadata:
+      labels:
+        app: tempo
+    spec:
+      containers:
+      - name: tempo
+        image: latipe/tempo:2.3.1
+        command: [ "-config.file=/conf/tempo.yaml" ]
+        ports:
+        - containerPort: 14268
+          name: jaeger
+        - containerPort: 9411
+          name: zipkin
+        - containerPort: 4317
+          name: otlp-grp
+        - containerPort: 4318
+          name: otlp-http
+        # volumeMounts:
+        # - name: config
+        #   mountPath: /conf/tempo.yaml
+        # - name: tempo-data
+        #   mountPath: /tmp/tempo
+        # resources:
+        #   limits:
+        #     cpu: 1000m
+        #     memory: 1Gi
+        #   requests:
+        #     cpu: 1000m
+        #     memory: 1Gi
+      restartPolicy: Always
+      # volumes:
+      # - name: config # volume use configmap as content
+      #   configMap:
+      #     name: tempo-configmap # configmap name
+  # volumeClaimTemplates:
+  # - metadata:
+  #     name: tempo-data
+  #   spec:
+  #     accessModes: [ "ReadWriteOnce" ]
+  #     resources:
+  #       requests:
+  #         storage: 1Gi
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: tempo
+# spec:
+#   selector:
+#     app: tempo # label selectors Pod tempo
+#   ports:
+#     - port: 14268 # port of the serivce
+#       targetPort: 14268 # port of the container that service will forward to
+#       name: jaeger
+#     - port: 9411
+#       targetPort: 9411
+#       name: zipkin
+#     - port: 4317
+#       targetPort: 4317
+#       name: otlp-grp
+#     - port: 4318
+#       targetPort: 4318
+#       name: otlp-http
