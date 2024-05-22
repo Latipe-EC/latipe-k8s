@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: latipe-webapp-service
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  strategy: # change here
+    type: RollingUpdate # strategy type is Recreate or RollingUpdate. Default is RollingUpdate
+  selector:
+    matchLabels:
+      app: latipe-webapp-service
+  template:
+    metadata:
+      labels:
+        app: latipe-webapp-service
+    spec:
+      containers:
+        - image: 0353486363/latipe-webapp:test1
+          imagePullPolicy: IfNotPresent
+          name: latipe-auth-service
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 200m
+              memory: 300Mi
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: latipe-webapp-service
+spec:
+  clusterIP: None
+  selector:
+    app: latipe-webapp-service
+  ports:
+    - name: http
+      port: 8000

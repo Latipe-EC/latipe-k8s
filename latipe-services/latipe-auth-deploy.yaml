@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: latipe-user-service
+  name: latipe-auth-service
   annotations:
     reloader.stakater.com/auto: "true"
 spec:
@@ -10,16 +10,16 @@ spec:
     type: RollingUpdate # strategy type is Recreate or RollingUpdate. Default is RollingUpdate
   selector:
     matchLabels:
-      app: latipe-user-service
+      app: latipe-auth-service
   template:
     metadata:
       labels:
-        app: latipe-user-service
+        app: latipe-auth-service
     spec:
       containers:
-        - image: 0353486363/latipe-user-service:latest
+        - image: 0353486363/latipe-auth-service:97d6b7b
           imagePullPolicy: IfNotPresent
-          name: latipe-user-service
+          name: latipe-auth-service
           env:
             - name: SPRING_DATA_MONGODB_URI
               valueFrom:
@@ -31,30 +31,9 @@ spec:
                 name: latipe-service-configmap
           resources:
             limits:
-              cpu: 500m
-              memory: 500Mi
+              cpu: 700m
+              memory: 700Mi
             requests:
               cpu: 200m
               memory: 300Mi
-      # restartPolicy: Always
-
-
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: latipe-user-service
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v2
-    kind: Deployment
-    name: latipe-user-service
-  minReplicas: 1
-  maxReplicas: 3
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 70
+      restartPolicy: Always

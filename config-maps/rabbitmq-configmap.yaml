@@ -4,8 +4,9 @@ metadata:
   name: rabbitmq-configmap
   # Add labels and annotations as per your requirements
 data:
-  definitions.json: |-
+  # definitions.json: |-
     # RabbitMQ definitions go here
-  enabled_plugins: '[rabbitmq_peer_discovery_k8s, rabbitmq_prometheus].'
-  rabbitmq.conf: |-
     # RabbitMQ configuration options go here
+  enabled_plugins: '[rabbitmq_peer_discovery_k8s, rabbitmq_management, rabbitmq_mqtt, rabbitmq_management_agent].'
+  # rabbitmq.conf: |-
+  #   # RabbitMQ configuration options go here

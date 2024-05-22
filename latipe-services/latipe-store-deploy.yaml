@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: latipe-store-service
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   replicas: 1
   strategy: # change here
@@ -15,38 +17,23 @@ spec:
         app: latipe-store-service
     spec:
       containers:
-        - image: 0353486363/latipe-store-service:latest
+        - image: 0353486363/latipe-store-service:97d6b7b
           imagePullPolicy: IfNotPresent
           name: latipe-store-service
           env:
-            - name: SETTINGS_FILE
-              value: "k8s.json"
+            - name: SPRING_DATA_MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: latipe-service-secret
+                  key: SPRING_DATA_MONGODB_URI
+          envFrom:
+            - configMapRef:
+                name: latipe-service-configmap
           resources:
             limits:
-              cpu: 500m
-              memory: 500Mi
+              cpu: 700m
+              memory: 700Mi
             requests:
               cpu: 200m
               memory: 300Mi
-      # restartPolicy: Always
-
-
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: latipe-store-service
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v2
-    kind: Deployment
-    name: latipe-store-service
-  minReplicas: 1
-  maxReplicas: 3
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 70
+      restartPolicy: Always

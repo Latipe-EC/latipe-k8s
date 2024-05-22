@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: latipe-api-gateway-service
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  strategy: # change here
+    type: RollingUpdate # strategy type is Recreate or RollingUpdate. Default is RollingUpdate
+  selector:
+    matchLabels:
+      app: latipe-api-gateway-service
+  template:
+    metadata:
+      labels:
+        app: latipe-api-gateway-service
+    spec:
+      containers:
+        - image: 0353486363/latipe-api-gateway-service:97d6b7b
+          imagePullPolicy: IfNotPresent
+          name: latipe-api-gateway-service
+          env:
+            - name: SPRING_DATA_MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: latipe-service-secret
+                  key: SPRING_DATA_MONGODB_URI
+            - name: GATEWAY_ROUTES
+              valueFrom:
+                configMapKeyRef:
+                  name: latipe-api-gateway-service-configmap
+                  key: GATEWAY_ROUTES
+          envFrom:
+            - configMapRef:
+                name: latipe-service-configmap
+          resources:
+            limits:
+              cpu: 700m
+              memory: 700Mi
+            requests:
+              cpu: 200m
+              memory: 300Mi
+          volumeMounts:
+            - name: config
+              mountPath: /conf/latipe-api-gateway-service/gateway.yaml
+              subPath: gateway.yaml
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name:  latipe-api-gateway-service-configmap
+      restartPolicy: Always
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: latipe-api-gateway-service
+spec:
+  clusterIP: None
+  selector:
+    app: latipe-api-gateway-service
+  ports:
+    - name: http
+      port: 8181

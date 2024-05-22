@@ -27,25 +27,27 @@ spec:
             # - name: prometheus
             #   containerPort: 15692
             #   protocol: TCP
-          livenessProbe:
-            exec:
-              command:
-              - rabbitmq-diagnostics
-              - status
-            initialDelaySeconds: 60
-            periodSeconds: 60
-            timeoutSeconds: 15
-          readinessProbe:
-            exec:
-              command:
-              - rabbitmq-diagnostics
-              - ping
-            initialDelaySeconds: 20
-            periodSeconds: 60
-            timeoutSeconds: 10
+          # livenessProbe:
+          #   exec:
+          #     command:
+          #     - rabbitmq-diagnostics
+          #     - status
+          #   initialDelaySeconds: 60
+          #   periodSeconds: 60
+          #   timeoutSeconds: 15
+          # readinessProbe:
+          #   exec:
+          #     command:
+          #     - rabbitmq-diagnostics
+          #     - ping
+          #   initialDelaySeconds: 20
+          #   periodSeconds: 60
+          #   timeoutSeconds: 10
           volumeMounts:
             - name: rabbitmq-config
-              mountPath: /etc/rabbitmq
+              mountPath: /etc/rabbitmq/enabled_plugins
+              subPath: enabled_plugins
+              readOnly: true
             - name: rabbitmq-data
               mountPath: /var/lib/rabbitmq/mnesia
           resources:

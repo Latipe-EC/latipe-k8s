@@ -28,6 +28,9 @@ spec:
                 secretKeyRef:
                   name: mongodb-secret
                   key: MONGO_INITDB_ROOT_PASSWORD
+        ports:
+          - containerPort: 27017
+            name: mongodb
         # livenessProbe:
         #   exec:
         #     command:
@@ -82,5 +85,5 @@ spec:
   selector:
     app: mongodb
   ports:
-    - name: http
-      port: 3306
+    - name: mongodb
+      port: 27017

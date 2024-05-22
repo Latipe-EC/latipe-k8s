@@ -4,5 +4,28 @@ metadata:
   name: latipe-service-configmap
 data:
   RABBIT_MQ_HOST: rabbitmq.latipe.svc.cluster.local
-  EUREKA_HOST: latipe-discovery-server-service.latipe.svc.cluster.local
-  GATE_WAY_HOST: latipe-api-gateway-service.latipe.svc.cluster.local
+  RABBIT_MQ_PORT: '5672'
+  REDIS_HOST: redis-cluster.latipe.svc.cluster.local
+  REDIS_PORT: "6379"
+  EUREKA_ENABLED: 'false'
+  LOKI_URL: http://loki.latipe.svc.cluster.local:3100/loki/api/v1/push
+  GATE_WAY_HOST: http://latipe-api-gateway-service.latipe.svc.cluster.local:8181
+  GATE_WAY_PORT: "8181"
+  AUTH_SERVICE: http://latipe-auth-service.latipe.svc.cluster.local:8081
+  AUTH_PORT: "8081"
+  CART_SERVICE: http://latipe-cart-service.latipe.svc.cluster.local:7650
+  CART_PORT: "7650"
+  MEDIA_SERVICE: http://latipe-media-service.latipe.svc.cluster.local:7657
+  MEDIA_PORT: "7657"
+  PAYMENT_SERVICE: http://latipe-payment-service.latipe.svc.cluster.local:8381
+  PAYMENT_PORT: "8381"
+  PRODUCT_SERVICE: http://latipe-product-service.latipe.svc.cluster.local:8645
+  PRODUCT_PORT: "8645"
+  RATING_SERVICE: http://latipe-rating-service.latipe.svc.cluster.local:8777
+  RATING_PORT: "8777"
+  SEARCH_SERVICE: http://latipe-search-service.latipe.svc.cluster.local:8092
+  SEARCH_PORT: "8092"
+  STORE_SERVICE: http://latipe-store-service.latipe.svc.cluster.local:8118
+  STORE_PORT: "8118"
+  USER_SERVICE: http://latipe-user-service.latipe.svc.cluster.local:8888
+  USER_PORT: "8888"
